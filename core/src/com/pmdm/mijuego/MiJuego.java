@@ -12,8 +12,6 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -66,15 +64,16 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
     // Tamaño del mapa de baldosas.
     private int anchoMapa, altoMapa;
 
+    boolean [][] obstaculo;
+
     //Atributos que indican la anchura y la altura de un tile del mapa de baldosas.
     int anchoCelda, altoCelda;
+
+    //Atributos que indican la anchura y altura del sprite animado del jugador.
+    int anchoJugador, altoJugador;
 	
 	@Override
 	public void create () {
-
-        //Ponemos el tamaño del mapa de baldosas
-        float anchura = 1000;
-        float altura = 1000;
 
         /*Creamos una cámara y la vinculamos con el lienzo del juego.
         En este caso le damos unos valores de tamaño que haga que el juego
@@ -105,10 +104,10 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         jugadorIzquierda​​ = new Animation(0.150f, tmp[3]);
 
         // ​En principio se utiliza la animación del jugador arriba como animación por defecto.
-        jugador = jugadorArriba​​;
+        jugador = jugadorAbajo​​;
 
         // ​Posición inicial del jugador.
-        jugadorX​ = jugadorY​​ = 0;
+        jugadorX​ = jugadorY​​ = 500;
 
         // ​Ponemos a cero el atributo stateTime, que marca el tiempo e ejecución de la animación.
         stateTime​​ = 0f;
@@ -131,7 +130,31 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         anchoMapa = capa.getWidth() * anchoCelda;
         altoMapa = capa.getHeight() * altoCelda;
 
+        //Cargamos las capas de los obstáculos.
+        TiledMapTileLayer capaObstaculos = (TiledMapTileLayer) mapa.getLayers().get(1);
+
+        //Cargamos la matriz de los obstáculos de los mapas de baldosas.
+        capaObstaculos(capaObstaculos);
+
+        //Cargamos en los atributos del ancho y alto del sprite sus valores
+        cuadroActual​​= (TextureRegion) jugador.getKeyFrame(stateTime​​);
+        anchoJugador =cuadroActual​​.getRegionWidth();
+        altoJugador = cuadroActual​​.getRegionHeight();
+
 	}
+
+	private void capaObstaculos (TiledMapTileLayer capa){
+
+        //Cargamos la matriz de los obstáculos del mapa de baldosas.
+        int anchoCapa = capa.getWidth(), altoCapa = capa.getHeight();
+        obstaculo = new boolean[altoCapa][anchoCapa];
+        for (int x = 0; x < anchoCapa; x++) {
+            for (int y = 0; y < altoCapa; y++) {
+                obstaculo[x][y] = (capa.getCell(x, y) != null);
+            }
+        }
+
+    }
 
 	@Override
 	public void render () {
@@ -200,9 +223,16 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         de forma adecuada 5 pixeles, y se pone a cero el
         ​atributo que marca el tiempo de ejecución de la animación,
         provocando que la misma se reinicie.*/
+
+        /*​Guardamos la posición anterior del jugador por si al desplazarlo se topa
+        con un obstáculo y podamos volverlo a la posición anterior.*/
+        float jugadorAnteriorX = jugadorX​;
+        float jugadorAnteriorY = jugadorY​​;
+
         stateTime​​= 0;
+
         if (keycode == Input.Keys.LEFT){
-            jugadorX​ += -5;
+            jugadorX​ -= 5;
             jugador = jugadorIzquierda​​;
         }
         if (keycode == Input.Keys.RIGHT) {
@@ -214,8 +244,17 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
             jugador = jugadorArriba​​;
         }
         if (keycode == Input.Keys.DOWN) {
-            jugadorY​​ += -5;
+            jugadorY​​ -= 5;
             jugador = jugadorAbajo​​;
+        }
+
+        //​Detectamos las colisiones con los obstáculos del mapa y si el jugador se sale del mismo.
+        if((jugadorX​ < 0 || jugadorY​​ < 0 || jugadorX​ > (anchoMapa - anchoJugador) ||
+                jugadorY​​ > (altoMapa - altoJugador)) ||
+                ((obstaculo [(int) ((jugadorX​ + anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]) ||
+                        (obstaculo [(int) ((jugadorX​ + 3 * anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]))){
+            jugadorX​ = jugadorAnteriorX;
+            jugadorY​​ = jugadorAnteriorY;
         }
 
         return false;
@@ -238,32 +277,46 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         //​Se pone a cero el atributo que marca el tiempo de ejecución de la animación, provocando que la misma se reinicie.
         stateTime​​ = 0;
 
+        /*​Guardamos la posición anterior del jugador por si al desplazarlo se topa
+        con un obstáculo y podamos volverlo a la posición anterior.*/
+        float jugadorAnteriorX = jugadorX​;
+        float jugadorAnteriorY = jugadorY​​;
+
         /*Si se ha pulsado por encima de la animación, se sube
         esta 5 píxeles y se reproduce la ​animación del jugador
         desplazándose hacia arriba.
          */
-        if (jugadorY​​ < posicion.y){
+        if ((jugadorY​​ +altoJugador) < posicion.y){
             jugadorY​​ += 5;
             jugador = jugadorArriba​​;
         /*​Si se ha pulsado por debajo de la animación, se baja esta 5 píxeles y
         se reproduce la animación del jugador desplazándose hacia abajo.*/
-        } else if(jugadorY​​ > posicion.y){
+        } else if((jugadorY​​) > posicion.y){
             jugadorY​​ -= 5;
             jugador = jugadorAbajo​​;
         }
 
-        /*​Si se ha pulsado a la derecha de la animación,
-        se mueve esta 5 píxeles a la derecha y ​se reproduce
-        la animación del jugador desplazándose hacia la derecha.*/
-        if(jugadorX​ < posicion.x){
+        /*​Si se ha pulsado más de la mitad del ancho del sprite a la derecha
+        de la animación, se mueve esta 5 píxeles a la derecha se reproduce la
+        animación del jugador desplazándose hacia la derecha.*/
+        if((jugadorX​ + anchoJugador/2) < posicion.x){
             jugadorX​ += 5;
-            jugador = jugadorIzquierda​​;
-        /*​Si se ha pulsado a la izquierda de la animación,
-        se mueve esta 5 píxeles a la izquierda y se reproduce
-        la animación del jugador desplazándose hacia la izquierda.*/
-        } else if (jugadorX​> posicion.x){
+            jugador = jugadorDerecha​​;
+        /*Si se ha pulsado mas de la mitad del ancho del sprite a la izquierda
+        de laanimación, se mueve esta 5 píxeles a la izquierda y se reproduce la
+        animación del jugador desplazándose hacia la izquierda.*/
+        } else if ((jugadorX​ - anchoJugador/2) > posicion.x){
             jugadorX​ -= 5;
             jugador = jugadorIzquierda​​;
+        }
+
+        //​Detectamos las colisiones con los obstáculos del mapa y si el jugador se sale del mismo.
+        if((jugadorX​ < 0 || jugadorY​​ < 0 || jugadorX​ > (anchoMapa - anchoJugador) ||
+                jugadorY​​ > (altoMapa - altoJugador)) ||
+                ((obstaculo [(int) ((jugadorX​ + anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]) ||
+                        (obstaculo [(int) ((jugadorX​ + 3 * anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]))){
+            jugadorX​ = jugadorAnteriorX;
+            jugadorY​​ = jugadorAnteriorY;
         }
 
         return true;
