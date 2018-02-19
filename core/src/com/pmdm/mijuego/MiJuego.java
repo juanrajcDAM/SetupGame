@@ -75,10 +75,6 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
 	@Override
 	public void create () {
 
-        //Ponemos el tamaño del mapa de baldosas
-        float anchura = 1000;
-        float altura = 1000;
-
         /*Creamos una cámara y la vinculamos con el lienzo del juego.
         En este caso le damos unos valores de tamaño que haga que el juego
         se muestre de forma idéntica en todas las plataformas.*/
@@ -108,7 +104,7 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         jugadorIzquierda​​ = new Animation(0.150f, tmp[3]);
 
         // ​En principio se utiliza la animación del jugador arriba como animación por defecto.
-        jugador = jugadorArriba​​;
+        jugador = jugadorAbajo​​;
 
         // ​Posición inicial del jugador.
         jugadorX​ = jugadorY​​ = 500;
@@ -135,24 +131,14 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         altoMapa = capa.getHeight() * altoCelda;
 
         //Cargamos las capas de los obstáculos.
-        /*TiledMapTileLayer capaObstaculos1 = (TiledMapTileLayer) mapa.getLayers().get(1);
-        TiledMapTileLayer capaObstaculos2 = (TiledMapTileLayer) mapa.getLayers().get(2);
-        TiledMapTileLayer capaObstaculos3 = (TiledMapTileLayer) mapa.getLayers().get(8);*/
-        TiledMapTileLayer capaObstaculos4 = (TiledMapTileLayer) mapa.getLayers().get(9);
-        /*TiledMapTileLayer capaObstaculos5 = (TiledMapTileLayer) mapa.getLayers().get(11);
-        TiledMapTileLayer capaObstaculos6 = (TiledMapTileLayer) mapa.getLayers().get(12);*/
+        TiledMapTileLayer capaObstaculos = (TiledMapTileLayer) mapa.getLayers().get(1);
 
         //Cargamos la matriz de los obstáculos de los mapas de baldosas.
-        /*capaObstaculos(capaObstaculos1);
-        capaObstaculos(capaObstaculos2);
-        capaObstaculos(capaObstaculos3);*/
-        capaObstaculos(capaObstaculos4);
-        /*capaObstaculos(capaObstaculos5);
-        capaObstaculos(capaObstaculos6);*/
+        capaObstaculos(capaObstaculos);
 
         //Cargamos en los atributos del ancho y alto del sprite sus valores
         cuadroActual​​= (TextureRegion) jugador.getKeyFrame(stateTime​​);
-        anchoJugador =cuadroActual​​.getRegionHeight();
+        anchoJugador =cuadroActual​​.getRegionWidth();
         altoJugador = cuadroActual​​.getRegionHeight();
 
 	}
@@ -246,7 +232,7 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         stateTime​​= 0;
 
         if (keycode == Input.Keys.LEFT){
-            jugadorX​ += -5;
+            jugadorX​ -= 5;
             jugador = jugadorIzquierda​​;
         }
         if (keycode == Input.Keys.RIGHT) {
@@ -258,17 +244,18 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
             jugador = jugadorArriba​​;
         }
         if (keycode == Input.Keys.DOWN) {
-            jugadorY​​ += -5;
+            jugadorY​​ -= 5;
             jugador = jugadorAbajo​​;
         }
 
-        // ​al chocar con un obstáculo el jugador vuelve a su posición inicial
-        // ​la parte izquierda de X es "X + 1/4 del ancho del jugador"
-        // ​la parte derecha de X es "X + 3/4 del ancho del jugador"
-        if ((obstaculo[(int) ((jugadorX​ + anchoJugador/4) / anchoCelda)][((int) (jugadorY​​) /
-                altoCelda)])
-                || (obstaculo[(int) ((jugadorX​ + 3*anchoJugador/4) / anchoCelda)][((int)
-                (jugadorY​​) / altoCelda)])) {
+        //​Detectamos las colisiones con los obstáculos del mapa y si el jugador se sale del mismo.
+        if ((jugadorX​ < 0 || jugadorY​​ < 0 ||
+                jugadorX​ > (anchoMapa - anchoJugador) ||
+                jugadorY​​ > (altoMapa - altoJugador)) ||
+                ((obstaculo[(int) ((jugadorX​ + anchoJugador / 4) / anchoCelda)][((int)
+                        (jugadorY​​) / altoCelda)]) ||
+                        (obstaculo[(int) ((jugadorY​​ + 3 * anchoJugador / 4) /
+                                anchoCelda)][((int) (jugadorY​​) / altoCelda)]))) {
             jugadorX​ = jugadorAnteriorX;
             jugadorY​​ = jugadorAnteriorY;
         }
