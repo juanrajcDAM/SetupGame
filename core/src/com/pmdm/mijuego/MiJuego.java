@@ -249,13 +249,10 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         }
 
         //​Detectamos las colisiones con los obstáculos del mapa y si el jugador se sale del mismo.
-        if ((jugadorX​ < 0 || jugadorY​​ < 0 ||
-                jugadorX​ > (anchoMapa - anchoJugador) ||
+        if((jugadorX​ < 0 || jugadorY​​ < 0 || jugadorX​ > (anchoMapa - anchoJugador) ||
                 jugadorY​​ > (altoMapa - altoJugador)) ||
-                ((obstaculo[(int) ((jugadorX​ + anchoJugador / 4) / anchoCelda)][((int)
-                        (jugadorY​​) / altoCelda)]) ||
-                        (obstaculo[(int) ((jugadorY​​ + 3 * anchoJugador / 4) /
-                                anchoCelda)][((int) (jugadorY​​) / altoCelda)]))) {
+                ((obstaculo [(int) ((jugadorX​ + anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]) ||
+                        (obstaculo [(int) ((jugadorX​ + 3 * anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]))){
             jugadorX​ = jugadorAnteriorX;
             jugadorY​​ = jugadorAnteriorY;
         }
@@ -304,7 +301,7 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         animación del jugador desplazándose hacia la derecha.*/
         if((jugadorX​ + anchoJugador/2) < posicion.x){
             jugadorX​ += 5;
-            jugador = jugadorIzquierda​​;
+            jugador = jugadorDerecha​​;
         /*Si se ha pulsado mas de la mitad del ancho del sprite a la izquierda
         de laanimación, se mueve esta 5 píxeles a la izquierda y se reproduce la
         animación del jugador desplazándose hacia la izquierda.*/
@@ -314,13 +311,10 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         }
 
         //​Detectamos las colisiones con los obstáculos del mapa y si el jugador se sale del mismo.
-        if ((jugadorX​ < 0 || jugadorY​​ < 0 ||
-                jugadorX​ > (anchoMapa - anchoJugador) ||
+        if((jugadorX​ < 0 || jugadorY​​ < 0 || jugadorX​ > (anchoMapa - anchoJugador) ||
                 jugadorY​​ > (altoMapa - altoJugador)) ||
-                ((obstaculo[(int) ((jugadorX​ + anchoJugador / 4) / anchoCelda)][((int)
-                        (jugadorY​​) / altoCelda)]) ||
-                        (obstaculo[(int) ((jugadorY​​ + 3 * anchoJugador / 4) /
-                                anchoCelda)][((int) (jugadorY​​) / altoCelda)]))) {
+                ((obstaculo [(int) ((jugadorX​ + anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]) ||
+                        (obstaculo [(int) ((jugadorX​ + 3 * anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]))){
             jugadorX​ = jugadorAnteriorX;
             jugadorY​​ = jugadorAnteriorY;
         }
