@@ -289,12 +289,15 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         //Dibujamos el TiledMap
 		mapaRenderer.render();
 
+        //​Dibujamos las tres primeras capas del TiledMap
+        int[] capas = {0,1,2,3,4,5,6,7,8,9,10,11,12,13};
+        mapaRenderer.render(capas);
+
         // ​extraemos el tiempo de la última actualización del sprite y la acumulamos a stateTime.
         stateTime​​ += Gdx.graphics.getDeltaTime();
 
         // ​Extraemos el frame que debe ir asociado al momento actual.
         cuadroActual​​ = (TextureRegion) jugador.getKeyFrame(stateTime​​); // 1
-
 
         // ​le indicamos al SpriteBatch que se muestre en el sistema de coordenadas específicas de la cámara.
         batch.setProjectionMatrix(camara.combined);
@@ -311,6 +314,13 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
 
 		batch.end();
 
+        //​Pintamos la cuarta capa del mapa de baldosas.
+        capas = new int[2];
+        capas[0]= 14;
+        capas[1]= 15;
+        mapaRenderer.render(capas);
+
+        //Comprobamos si hay o no colisiones entre en jugador y los NPC
         detectaColisiones​​();
 	}
 
@@ -540,7 +550,7 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         }
 
         return true;
-        
+
     }
 
     @Override
