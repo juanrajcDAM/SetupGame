@@ -11,6 +11,10 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+		//Deshabilitamos el uso del acelerómetro y la brújula.
+		config.useAccelerometer = false;
+		config.useCompass = false;
+		//Lanzamos el juego.
 		initialize(new MiJuego(), config);
 	}
 }
