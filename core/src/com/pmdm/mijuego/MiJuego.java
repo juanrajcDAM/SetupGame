@@ -347,8 +347,6 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
         capas[1]= 15;
         mapaRenderer.render(capas);
 
-        //Comprobamos si hay o no colisiones entre en jugador y los NPC.
-        detectaColisiones​​();
 	}
 
     @Override
@@ -383,6 +381,10 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
             jugadorY​​ -= 5;
             jugador = jugadorAbajo​​;
         }
+
+        if(keycode == Input.Keys.SPACE)
+            //Comprobamos si hay o no colisiones entre en jugador y los NPC.
+            detectaColisiones​​();
 
         //​Detectamos las colisiones con los obstáculos del mapa y si el jugador se sale del mismo.
         if((jugadorX​ < 0 || jugadorY​​ < 0 || jugadorX​ > (anchoMapa - anchoJugador) ||
@@ -627,14 +629,14 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
 
                 //y se desplaza al NPC en dirección contraria a la posición del jugador.
                 if(noJugadorX[i]>jugadorX​){
-                    noJugadorX[i]++;
+                    noJugadorX[i]+=20;
                 } else {
-                    noJugadorX[i]--;
+                    noJugadorX[i]-=20;
                 }
                 if(noJugadorY[i]>jugadorY​​){
-                    noJugadorY[i]++;
+                    noJugadorY[i]+=20;
                 } else {
-                    noJugadorY[i]--;
+                    noJugadorY[i]-=20;
                 }
 
             }
