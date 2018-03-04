@@ -1,6 +1,7 @@
 package com.pmdm.mijuego;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
@@ -20,7 +21,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
-public class MiJuego extends ApplicationAdapter implements InputProcessor {
+public class MiJuego extends ApplicationAdapter implements InputProcessor, ApplicationListener {
 
     // Atributo en el que se cargará la hoja de sprites del mosquetero.
 	Texture img;
@@ -104,6 +105,9 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
     de los NPC , servirá para determinar cual es el frame que se debe representar.
     */
     private float stateTimeNPC;
+
+    //Música del juego.
+    Music musica;
 
     //Sonidos del juego.
     Sound sonidoColisionEnemigo, sonidoPasos, sonidoObstaculo;
@@ -257,7 +261,7 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
         stateTimeNPC = 0f;
 
         //Inicializamos la música de fondo del juego y la reproducimos.
-        Music musica = Gdx.audio.newMusic(Gdx.files.internal("Overworld.ogg"));
+        musica = Gdx.audio.newMusic(Gdx.files.internal("Overworld.ogg"));
 
         //Establecemos que se reproduzca en bucle.
         musica.setLooping(true);
@@ -345,12 +349,6 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
 
         //Comprobamos si hay o no colisiones entre en jugador y los NPC.
         detectaColisiones​​();
-	}
-
-	@Override
-	public void dispose () {
-		batch.dispose();
-		img.dispose();
 	}
 
     @Override
@@ -511,6 +509,28 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor {
     @Override
     public boolean scrolled(int amount) {
         return false;
+    }
+
+    @Override
+    public void pause() {
+        super.pause();
+    }
+
+    @Override
+    public void resume() {
+        super.resume();
+    }
+
+    @Override
+    public void dispose () {
+        mapa.dispose();
+        mapaRenderer.dispose();
+        img.dispose();
+        batch.dispose();
+        musica.dispose();
+        sonidoObstaculo.dispose();
+        sonidoPasos.dispose();
+        sonidoColisionEnemigo.dispose();
     }
 
     /**
