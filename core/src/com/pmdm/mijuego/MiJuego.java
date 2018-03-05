@@ -111,6 +111,9 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
 
     //Sonidos del juego.
     Sound sonidoColisionEnemigo, sonidoPasos, sonidoObstaculo;
+
+    //Posición de la pulsación en pantalla.
+    Vector3 posicion;
 	
 	@Override
 	public void create () {
@@ -328,6 +331,9 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
         //Iniciamos el SpriteBatch.
 		batch.begin();
 
+		//Actualizamos la posición del jugador.
+		actualizaJugador(0.5f);
+
 		//Dibujamos al jugador.
 		batch.draw(cuadroActual​​, jugadorX​, jugadorY​​); // 2
 
@@ -382,6 +388,7 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
             jugador = jugadorAbajo​​;
         }
 
+        //Si se pulsa la barra espaciadora...
         if(keycode == Input.Keys.SPACE)
             //Comprobamos si hay o no colisiones entre en jugador y los NPC.
             detectaColisiones​​();
@@ -426,67 +433,7 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
         Vector3 clickCoordinates = new Vector3(screenX, screenY, 0);
 
         //Transformamos las coordenadas del vector a coordenadas de nuestra cámara.
-        Vector3 posicion = camara.unproject(clickCoordinates);
-
-        /*
-        ​Guardamos la posición anterior del jugador por si al desplazarlo se topa
-        con un obstáculo y podamos devolverlo a la posición anterior.
-        */
-        float jugadorAnteriorX = jugadorX​;
-        float jugadorAnteriorY = jugadorY​​;
-
-        /*
-        Si se ha pulsado por encima de la animación, se sube
-        esta 5 píxeles y se reproduce la ​animación del jugador
-        desplazándose hacia arriba.
-         */
-        if ((jugadorY​​ +altoJugador) < posicion.y){
-            while((jugadorY​​ +altoJugador) < posicion.y) {
-                jugadorY​​ += 5;
-                jugador = jugadorArriba​​;
-            }
-        /*​
-        Si se ha pulsado por debajo de la animación, se baja esta 5 píxeles y
-        se reproduce la animación del jugador desplazándose hacia abajo.
-        */
-        } else if((jugadorY​​) > posicion.y){
-            while((jugadorY​​) > posicion.y) {
-                jugadorY​​ -= 5;
-                jugador = jugadorAbajo​​;
-            }
-        }
-
-        /*
-        ​Si se ha pulsado más de la mitad del ancho del sprite a la derecha
-        de la animación, se mueve esta 5 píxeles a la derecha se reproduce la
-        animación del jugador desplazándose hacia la derecha.
-        */
-        if((jugadorX​ + anchoJugador/2) < posicion.x){
-            while((jugadorX​ + anchoJugador/2) < posicion.x) {
-                jugadorX​ += 5;
-                jugador = jugadorDerecha​​;
-            }
-        /*
-        Si se ha pulsado mas de la mitad del ancho del sprite a la izquierda
-        de laanimación, se mueve esta 5 píxeles a la izquierda y se reproduce la
-        animación del jugador desplazándose hacia la izquierda.
-        */
-        } else if ((jugadorX​ - anchoJugador/2) > posicion.x){
-            while((jugadorX​ - anchoJugador/2) > posicion.x) {
-                jugadorX​ -= 5;
-                jugador = jugadorIzquierda​​;
-            }
-        }
-
-        //​Detectamos las colisiones con los obstáculos del mapa y si el jugador se sale del mismo.
-        if((jugadorX​ < 0 || jugadorY​​ < 0 || jugadorX​ > (anchoMapa - anchoJugador) ||
-                jugadorY​​ > (altoMapa - altoJugador)) ||
-                ((obstaculo [(int) ((jugadorX​ + anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]) ||
-                        (obstaculo [(int) ((jugadorX​ + 3 * anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]))){
-            jugadorX​ = jugadorAnteriorX;
-            jugadorY​​ = jugadorAnteriorY;
-            sonidoObstaculo.play();
-        }
+        posicion = camara.unproject(clickCoordinates);
 
         return false;
     }
@@ -497,11 +444,24 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
         //Seteamos la animación para que se pare.
         jugador.setPlayMode(Animation.PlayMode.NORMAL);
 
+        //Si se deja de pulsar en la pantalla, la posición se vuelve nula.
+        posicion=null;
+
 	    return false;
     }
 
     @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+
+        //Vector en tres dimensiones que recoge las coordenadas donde se ha hecho click o toque de la pantalla.
+        Vector3 clickCoordinates = new Vector3(screenX, screenY, 0);
+
+        //Transformamos las coordenadas del vector a coordenadas de nuestra cámara.
+        posicion = camara.unproject(clickCoordinates);
+
+	    return false;
+
+	}
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
@@ -549,6 +509,75 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
             for (int y = 0; y < altoCapa; y++) {
                 obstaculo[x][y] = (capa.getCell(x, y) != null);
             }
+        }
+
+    }
+
+    /**
+     * Método que actualiza la posición del jugador dependiendo de donde se pulse en la pantalla.
+     *
+     * @param delta Variación delta.
+     */
+    private void actualizaJugador(float delta){
+
+        //Si la posición no es nula (se está pulsando en la pantalla)...
+        if(posicion!=null){
+
+	        /*
+        ​Guardamos la posición anterior del jugador por si al desplazarlo se topa
+        con un obstáculo y podamos devolverlo a la posición anterior.
+        */
+            float jugadorAnteriorX = jugadorX​;
+            float jugadorAnteriorY = jugadorY​​;
+
+        /*
+        Si se ha pulsado por encima de la animación, se sube
+        esta 5 píxeles y se reproduce la ​animación del jugador
+        desplazándose hacia arriba.
+         */
+            if ((jugadorY​​ +altoJugador) < posicion.y){
+                jugadorY​​ += delta*5;
+                jugador = jugadorArriba​​;
+        /*​
+        Si se ha pulsado por debajo de la animación, se baja esta 5 píxeles y
+        se reproduce la animación del jugador desplazándose hacia abajo.
+        */
+            } else if((jugadorY​​) > posicion.y){
+                jugadorY​​ -= delta*5;
+                jugador = jugadorAbajo​​;
+
+            }
+
+        /*
+        ​Si se ha pulsado más de la mitad del ancho del sprite a la derecha
+        de la animación, se mueve esta 5 píxeles a la derecha se reproduce la
+        animación del jugador desplazándose hacia la derecha.
+        */
+            if((jugadorX​ + anchoJugador/2) < posicion.x){
+                jugadorX​ += delta*5;
+                jugador = jugadorDerecha​​;
+
+        /*
+        Si se ha pulsado mas de la mitad del ancho del sprite a la izquierda
+        de laanimación, se mueve esta 5 píxeles a la izquierda y se reproduce la
+        animación del jugador desplazándose hacia la izquierda.
+        */
+            } else if ((jugadorX​ - anchoJugador/2) > posicion.x){
+                jugadorX​ -= delta*5;
+                jugador = jugadorIzquierda​​;
+
+            }
+
+            //​Detectamos las colisiones con los obstáculos del mapa y si el jugador se sale del mismo.
+            if((jugadorX​ < 0 || jugadorY​​ < 0 || jugadorX​ > (anchoMapa - anchoJugador) ||
+                    jugadorY​​ > (altoMapa - altoJugador)) ||
+                    ((obstaculo [(int) ((jugadorX​ + anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]) ||
+                            (obstaculo [(int) ((jugadorX​ + 3 * anchoJugador / 4) / anchoCelda)][((int) (jugadorY​​) / altoCelda)]))){
+                jugadorX​ = jugadorAnteriorX;
+                jugadorY​​ = jugadorAnteriorY;
+                sonidoObstaculo.play();
+            }
+
         }
 
     }
