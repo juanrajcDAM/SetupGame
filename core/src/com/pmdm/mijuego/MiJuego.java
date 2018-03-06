@@ -114,6 +114,9 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
 
     //Posición de la pulsación en pantalla.
     Vector3 posicion;
+
+    //Variables para el sonido de los pasos.
+    float valorPasos=5f, valorMovimiento;
 	
 	@Override
 	public void create () {
@@ -447,6 +450,10 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
         //Si se deja de pulsar en la pantalla, la posición se vuelve nula.
         posicion=null;
 
+        //Se reinician los valores del algoritmo de los pasos.
+        valorPasos=5f;
+        valorMovimiento=0f;
+
 	    return false;
     }
 
@@ -523,45 +530,54 @@ public class MiJuego extends ApplicationAdapter implements InputProcessor, Appli
         //Si la posición no es nula (se está pulsando en la pantalla)...
         if(posicion!=null){
 
+            //Algoritmo para que los pasos suenen más naturales.#####################
+            valorMovimiento+=0.5f;
+
+            if(valorPasos==valorMovimiento){
+                sonidoPasos.play();
+                valorPasos+=10f;
+            }
+            //#######################################################################
+
 	        /*
-        ​Guardamos la posición anterior del jugador por si al desplazarlo se topa
-        con un obstáculo y podamos devolverlo a la posición anterior.
-        */
+            ​Guardamos la posición anterior del jugador por si al desplazarlo se topa
+            con un obstáculo y podamos devolverlo a la posición anterior.
+            */
             float jugadorAnteriorX = jugadorX​;
             float jugadorAnteriorY = jugadorY​​;
 
-        /*
-        Si se ha pulsado por encima de la animación, se sube
-        esta 5 píxeles y se reproduce la ​animación del jugador
-        desplazándose hacia arriba.
-         */
+            /*
+            Si se ha pulsado por encima de la animación, se sube
+            esta 5 píxeles y se reproduce la ​animación del jugador
+            desplazándose hacia arriba.
+            */
             if ((jugadorY​​ +altoJugador) < posicion.y){
                 jugadorY​​ += delta*5;
                 jugador = jugadorArriba​​;
-        /*​
-        Si se ha pulsado por debajo de la animación, se baja esta 5 píxeles y
-        se reproduce la animación del jugador desplazándose hacia abajo.
-        */
+            /*​
+            Si se ha pulsado por debajo de la animación, se baja esta 5 píxeles y
+            se reproduce la animación del jugador desplazándose hacia abajo.
+            */
             } else if((jugadorY​​) > posicion.y){
                 jugadorY​​ -= delta*5;
                 jugador = jugadorAbajo​​;
 
             }
 
-        /*
-        ​Si se ha pulsado más de la mitad del ancho del sprite a la derecha
-        de la animación, se mueve esta 5 píxeles a la derecha se reproduce la
-        animación del jugador desplazándose hacia la derecha.
-        */
+            /*
+        ​   Si se ha pulsado más de la mitad del ancho del sprite a la derecha
+            de la animación, se mueve esta 5 píxeles a la derecha se reproduce la
+            animación del jugador desplazándose hacia la derecha.
+            */
             if((jugadorX​ + anchoJugador/2) < posicion.x){
                 jugadorX​ += delta*5;
                 jugador = jugadorDerecha​​;
 
-        /*
-        Si se ha pulsado mas de la mitad del ancho del sprite a la izquierda
-        de laanimación, se mueve esta 5 píxeles a la izquierda y se reproduce la
-        animación del jugador desplazándose hacia la izquierda.
-        */
+            /*
+            Si se ha pulsado mas de la mitad del ancho del sprite a la izquierda
+            de laanimación, se mueve esta 5 píxeles a la izquierda y se reproduce la
+            animación del jugador desplazándose hacia la izquierda.
+            */
             } else if ((jugadorX​ - anchoJugador/2) > posicion.x){
                 jugadorX​ -= delta*5;
                 jugador = jugadorIzquierda​​;
